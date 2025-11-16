@@ -17,27 +17,43 @@ function Card(props) {
   function toggle() {
     setVisible(!visible);
   }
+  function HotelRating({ stars }) {
+  const totalStars = 5; // max stars (optional)
+  return (
+    <div>
+      {"★".repeat(stars)}{"☆".repeat(totalStars - stars)}
+    </div>
+  );
+}
+
 
   return (
-    <>
+    <> 
       <div className="all">
         <div className={Styles.card}>
           <img src={Stle} className={Styles.img} alt="pas" />
-          <div className={Styles.cardBody}>
-            <h5 className="card-title">{props.title}</h5>
-            <p className="card-text">{props.description}</p>
-          </div>
+          {!visible && (
+                 <>
+                 <div className={Styles.bas}>
+
+                 
+                 <h5 className="card-title">{props.title}</h5>
+                 <p className="card-text">{props.description}</p>
+                 </div>
+  </>
+)}
 
           {visible && (
             <>
-              <ul className="list-group list-group-flush">
+              <ul className={Styles.ul}>
                 <li className="list-group-item">Price/ per day : {props.price}</li>
                 <li className="list-group-item">Location : {props.location}</li>
-                <li className="list-group-item">Rate : {props.stars}</li>
+            <HotelRating stars={props.stars} />
+
               </ul>
-              <div className="card-body">
+              <div className={Styles.westi}>
                 <a href="#" className="card-link">Map</a>
-                <button onClick={bookNow}>Book Now</button>
+                <button onClick={bookNow} className={Styles.book}>Book Now</button>
               </div>
             </>
           )}
@@ -52,16 +68,20 @@ function Card(props) {
       {book && (
         <div style={{
           position: 'fixed',
-          top: 0, left: 0,
+          top: 0,
+          left: 0,
+          backgroundColor: 'rgba(207, 191, 191, 0.5)',
           width: '100%',
           height: '100%',
-          backgroundColor: 'rgba(0,0,0,0.5)',
+          alignContent: 'center',
+          alignItems: 'center',
           display: 'flex',
           justifyContent: 'center',
-          alignItems: 'center',
-          zIndex: 9999,
-          overflowY: 'auto',
-          padding: '20px'
+          
+          
+      
+          
+          
         }}>
           <div className="card shadow-sm p-4" style={{ width: '600px', maxWidth: '95%' }}>
             <h2 className="card-title mb-4 text-center">Réserver une chambre</h2>

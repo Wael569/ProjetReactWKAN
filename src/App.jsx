@@ -5,7 +5,7 @@ function App() {
 
   return (
     <>
-      <Card description="Description de l'hotel a3ti li 3andek" title="Hotel Mr Othmen Jnayeh" location="Sousse/sahloul" price="150dt" stars="5 Stars" />
+      <Card description="Description de l'hotel a3ti li 3andek" title="Hotel Mr Othmen Jnayeh" location="Sousse/sahloul" price="150dt" stars={4} />
     </>
   )
 }
