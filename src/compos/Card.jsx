@@ -52,7 +52,7 @@ function Card(props) {
 
               </ul>
               <div className={Styles.westi}>
-                <a href="#" className="card-link">Map</a>
+                <a href="https://www.google.com/travel/search?qs=MhRDZ3NJaHNQVDVlTHJzWUhuQVJBQjgASAA&ts=CAEaNQoVEhMKCS9tLzAzeXY2cjoGU291c3NlEhwSFAoHCOkPEAwYARIHCOkPEAwYAhgBMgQIABAAKgcKBToDVE5E&utm_campaign=sharing&utm_medium=link_btn&utm_source=htls" className="card-link">Map</a>
                 <button onClick={bookNow} className={Styles.book}>Book Now</button>
               </div>
             </>
