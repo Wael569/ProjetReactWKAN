@@ -1,8 +1,7 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import HomePage from './HomePage.jsx';
+import Card from './compos/Card'
+
 function App() {
  
 
@@ -10,6 +9,7 @@ function App() {
     <>
       <HomePage />
      
+      <Card description="Description de l'hotel a3ti li 3andek" title="Hotel Mr Othmen Jnayeh" location="Sousse/sahloul" price="150dt" stars={4} />
     </>
   )
 }
