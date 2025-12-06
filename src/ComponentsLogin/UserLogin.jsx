@@ -7,6 +7,7 @@ const UserLogin = (props) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     alert(`Welcome ${email}!`);
+    if (props.onLogin) props.onLogin();
   };
   return (
     <>

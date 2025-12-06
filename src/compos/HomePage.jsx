@@ -3,7 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 
-export default function HomePage() {
+export default function HomePage({ onExplore }) {
     return (
         <div className="bg-white text-dark">
 
@@ -49,17 +49,6 @@ export default function HomePage() {
                         <a className="fw-semibold fs-5 text-white text-decoration-none">News</a>
                         <a className="fw-semibold fs-5 text-white text-decoration-none">Contact</a>
 
-                        <button className="btn btn-outline-light px-3 py-1 rounded-pill">
-                            Login
-                        </button>
-                        <button
-                            className="btn px-3 py-1 rounded-pill text-white"
-                            style={{
-                                background: "linear-gradient(to right, #ff9f40, #8a4fff)"
-                            }}
-                        >
-                            Sign In
-                        </button>
                     </nav>
                 </div>
 
@@ -109,8 +98,9 @@ export default function HomePage() {
                         style={{
                             background: "linear-gradient(to right, #ff9f40, #8a4fff)"
                         }}
+                        onClick={onExplore}
                     >
-                        EXPLORE NOW
+                        BOOK  NOW
                     </button>
                 </div>
 
@@ -153,7 +143,6 @@ export default function HomePage() {
         </div>
     </div>
 </div>
-{/* Why Choose Us */}
 <div className="container my-5 text-center">
     <h2 className="fw-bold mb-4">Why Choose Us?</h2>
 

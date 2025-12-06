@@ -3,11 +3,13 @@ import React, { useState } from 'react';
 import UserLogin from './ComponentsLogin/UserLogin.jsx';
 import UserSignup from './ComponentsLogin/UserSignup.jsx';
 import ForgotPassword from './ComponentsLogin/ForgotPassword.jsx'; 
+import HomePage from './compos/HomePage.jsx';
+import Reservation from './compos/Reservation.jsx';
 import './App.css';
 
 function App() {
   const [currentView, setCurrentView] = useState('login'); 
-  // login | signup | forgot
+  // login | signup | forgot | home | reservation
 
   return (
     <div className="App">
@@ -15,6 +17,7 @@ function App() {
         <UserLogin 
           onSwitchToSignup={() => setCurrentView('signup')}
           onSwitchToForgot={() => setCurrentView('forgot')}
+          onLogin={() => setCurrentView('home')}
         />
       )}
 
@@ -28,6 +31,14 @@ function App() {
         <ForgotPassword 
           onBackToLogin={() => setCurrentView('login')}
         />
+      )}
+
+      {currentView === 'home' && (
+        <HomePage onExplore={() => setCurrentView('reservation')} />
+      )}
+
+      {currentView === 'reservation' && (
+        <Reservation onBackToHome={() => setCurrentView('home')} />
       )}
     </div>
   );
