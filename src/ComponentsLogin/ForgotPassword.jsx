@@ -1,12 +1,15 @@
 // src/ComponentsLogin/ForgotPassword.jsx
 import React, { useState } from "react";
+import { Link } from "react-router-dom"; // 👈
 
-const ForgotPassword = (props) => {
+const ForgotPassword = () => {
   const [email, setEmail] = useState("");
+
   const handleSubmit = (e) => {
     e.preventDefault();
     alert(`A reset link has been sent to: ${email}`);
   };
+
   return (
     <>
       <style>
@@ -64,17 +67,14 @@ const ForgotPassword = (props) => {
             </button>
           </form>
           <div className="text-center mt-4">
-            <a
-              href="#back"
+            {/* 👇 direct retour l /login */}
+            <Link
+              to="/login"
               className="text-decoration-none fw-semibold"
               style={{ color: "#f9105eff" }}
-              onClick={(e) => {
-                e.preventDefault();
-                if (props.onBackToLogin) props.onBackToLogin();
-              }}
             >
               Back to Login
-            </a>
+            </Link>
           </div>
         </div>
       </div>
