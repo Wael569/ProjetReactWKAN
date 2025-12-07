@@ -4,12 +4,10 @@ export default function HotelDetails() {
     return (
         <div className="container my-5">
 
-            {/* Title */}
             <h1 className="fw-bold mb-3">Royal Palace Hotel</h1>
             <p className="text-muted mb-1">Paris, France</p>
             <p className="text-warning fs-4">⭐⭐⭐⭐☆ 4.5</p>
 
-            {/* Image Gallery */}
             <div className="row g-3 mb-4">
                 <div className="col-md-8">
                     <img

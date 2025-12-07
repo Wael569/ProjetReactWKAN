@@ -1,13 +1,24 @@
 // src/ComponentsLogin/UserLogin.jsx
 import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 
-const UserLogin = (props) => {
-  const [email, setEmail] = useState("");
+const UserLogin = ({ onLogin }) => {
+  const [name, setName] = useState("");   // 🔹 بدلنا email → name
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert(`Welcome ${email}!`);
+
+    alert(`Welcome ${name}!`);
+
+    if (onLogin) {
+      onLogin(name);   // 🔹 نبعت الإسم لـ App.jsx
+    }
+
+    navigate("/"); // redirect to Home
   };
+
   return (
     <>
       <style>
@@ -17,6 +28,7 @@ const UserLogin = (props) => {
           }
         `}
       </style>
+
       <div
         className="d-flex justify-content-center align-items-center"
         style={{ minHeight: "100vh" }}
@@ -58,18 +70,21 @@ const UserLogin = (props) => {
               </span>
             </h4>
           </div>
+
           <form onSubmit={handleSubmit}>
+            {/* 🔹 Name instead of Email */}
             <div className="mb-3">
-              <label className="form-label fw-semibold text-dark">Email</label>
+              <label className="form-label fw-semibold text-dark">Name</label>
               <input
                 type="text"
                 className="form-control"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 required
-                placeholder="Enter your email"
+                placeholder="Enter your name"
               />
             </div>
+
             <div className="mb-3">
               <label className="form-label fw-semibold text-dark">
                 Password
@@ -83,19 +98,17 @@ const UserLogin = (props) => {
                 placeholder="Enter your password"
               />
             </div>
+
             <div className="mb-3 text-end">
-              <a
-                href="#forgot"
+              <Link
+                to="/forgot"
                 className="text-decoration-none fw-semibold"
                 style={{ color: "#f9105eff" }}
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (props.onSwitchToForgot) props.onSwitchToForgot();
-                }}
               >
                 forget password?
-              </a>
+              </Link>
             </div>
+
             <button
               type="submit"
               className="btn w-100 py-2 fw-bold border-0"
@@ -109,22 +122,17 @@ const UserLogin = (props) => {
               Sign in
             </button>
           </form>
+
           <div className="text-center mt-3">
             <p className="text-muted mb-0">
               Don't have an account?{" "}
-              <a
-                href="#signup"
+              <Link
+                to="/signup"
                 className="text-decoration-none fw-bold"
                 style={{ color: "#f9105eff" }}
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (props.onSwitchToSignup) {
-                    props.onSwitchToSignup();
-                  }
-                }}
               >
                 Create Account
-              </a>
+              </Link>
             </p>
           </div>
         </div>
