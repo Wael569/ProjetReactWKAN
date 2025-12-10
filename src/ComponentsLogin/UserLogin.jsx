@@ -3,20 +3,48 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
 const UserLogin = ({ onLogin }) => {
-  const [name, setName] = useState("");   // 🔹 بدلنا email → name
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
-    alert(`Welcome ${name}!`);
+    try {
+      // Call backend API
+      const response = await fetch("http://localhost/backend/api.php/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
+      });
 
-    if (onLogin) {
-      onLogin(name);   // 🔹 نبعت الإسم لـ App.jsx
+      const data = await response.json();
+
+      if (response.ok) {
+        // Login successful
+        alert(`Welcome ${data.user.firstName}!`);
+
+        if (onLogin) {
+          onLogin(data.user.firstName);
+        }
+
+        navigate("/");
+      } else {
+        alert(`Error: ${data.message}`);
+      }
+    } catch (error) {
+      alert(`Network error: ${error.message}`);
+      console.error("Login error:", error);
+    } finally {
+      setLoading(false);
     }
-
-    navigate("/"); // redirect to Home
   };
 
   return (
@@ -72,16 +100,16 @@ const UserLogin = ({ onLogin }) => {
           </div>
 
           <form onSubmit={handleSubmit}>
-            {/* 🔹 Name instead of Email */}
+            {/* Email field */}
             <div className="mb-3">
-              <label className="form-label fw-semibold text-dark">Name</label>
+              <label className="form-label fw-semibold text-dark">Email</label>
               <input
-                type="text"
+                type="email"
                 className="form-control"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
-                placeholder="Enter your name"
+                placeholder="Enter your email"
               />
             </div>
 
@@ -112,6 +140,7 @@ const UserLogin = ({ onLogin }) => {
             <button
               type="submit"
               className="btn w-100 py-2 fw-bold border-0"
+              disabled={loading}
               style={{
                 backgroundColor: "#8B5FBF",
                 color: "white",
@@ -119,7 +148,7 @@ const UserLogin = ({ onLogin }) => {
                 fontSize: "1.1rem",
               }}
             >
-              Sign in
+              {loading ? "Signing in..." : "Sign in"}
             </button>
           </form>
 

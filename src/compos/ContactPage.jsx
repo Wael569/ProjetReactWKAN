@@ -14,11 +14,29 @@ export default function ContactPage() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    alert(`Thank you ${form.name}, we have received your message!`);
-    setForm({ name: "", email: "", message: "" });
-  };
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    const response = await fetch("http://localhost/backend/contactapi.php/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert("Message sent successfully!");
+      setForm({ name: "", email: "", message: "" });
+    } else {
+      alert(`Error: ${data.message}`);
+    }
+  } catch (error) {
+    alert("Network error, please try again later");
+    console.error(error);
+  }
+};
 
   return (
     <div className="bg-light min-vh-100 py-5">
@@ -86,7 +104,8 @@ export default function ContactPage() {
                   Our team is available 24/7 to help you with your bookings.
                 </p>
                 <p className="mb-1">
-                  <strong>Email:</strong> support@travana.com
+                  <strong>Email:</strong> support@travana.com 
+                  
                 </p>
                 <p className="mb-0">
                   <strong>Phone:</strong> +216 71 000 000

@@ -1,4 +1,3 @@
-// src/compos/Reservation.jsx
 import React, { useState, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -17,6 +16,7 @@ const PROMO_CODES = {
     discount: 0.15, // 15%
   },
 };
+
 
 export default function Reservation({ onBackToHome }) {
   const location = useLocation();
@@ -117,33 +117,65 @@ export default function Reservation({ onBackToHome }) {
     appliedDiscount,
   ]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert(
-      `Reservation confirmed for ${formData.name} at ${hotelName}.\nTotal: ${currency} ${finalPrice.toFixed(
-        2
-      )}`
-    );
 
-    // reset
-    setFormData({
-      checkIn: "",
-      checkOut: "",
-      adults: 1,
-      children: 0,
-      name: "",
-      email: "",
-      phone: "",
-    });
-    setPromoCode("");
-    setAppliedDiscount(0);
-    setPromoStatus(null);
+    // Prepare payload
+    const payload = {
+      check_in: formData.checkIn,
+      check_out: formData.checkOut,
+      adults: formData.adults,
+      children: formData.children,
+      full_name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      promo_code: promoCode,
+      nights: nights,
+      price_per_night: pricePerNight,
+      total_price: finalPrice,
+    };
+
+    try {
+      const response = await fetch("http://localhost/backend/apireservation.php/reservations", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert(`Reservation confirmed! ${data.message}`);
+        // reset
+        setFormData({
+          checkIn: "",
+          checkOut: "",
+          adults: 1,
+          children: 0,
+          name: "",
+          email: "",
+          phone: "",
+        });
+        setPromoCode("");
+        setAppliedDiscount(0);
+        setPromoStatus(null);
+        navigate("/"); // back to home or wherever you want
+      } else {
+        alert(`Error: ${data.message}`);
+      }
+    } catch (error) {
+      console.error("Reservation error:", error);
+      alert(`Network error: ${error.message}`);
+    }
   };
 
   const handleBack = () => {
     if (onBackToHome) onBackToHome();
     else navigate("/");
   };
+  
 
   return (
     <div className="bg-light min-vh-100 py-5">

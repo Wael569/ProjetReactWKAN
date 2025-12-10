@@ -21,12 +21,48 @@ const UserSignup = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert(`Account created for ${formData.firstName} ${formData.lastName}!`);
 
-    // ba3d ma ycréé compte nraj3ouh l /login
-    navigate("/login");
+    // Validate form
+    if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
+      alert("Please fill in all fields");
+      return;
+    }
+
+    if (!formData.agreeTerms) {
+      alert("Please agree to the terms and conditions");
+      return;
+    }
+
+    try {
+      // Call backend API
+      const response = await fetch("http://localhost/backend/api.php/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert(`Account created for ${formData.firstName} ${formData.lastName}!`);
+        // Navigate to login after successful registration
+        navigate("/login");
+      } else {
+        alert(`Error: ${data.message}`);
+      }
+    } catch (error) {
+      alert(`Network error: ${error.message}`);
+      console.error("Registration error:", error);
+    }
   };
 
   return (
