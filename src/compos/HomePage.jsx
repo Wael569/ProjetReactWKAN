@@ -1,5 +1,5 @@
 // src/compos/HomePage.jsx
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
@@ -8,7 +8,7 @@ export default function HomePage({ userName, isLoggedIn, onLogout }) {
   const navigate = useNavigate();
 
   const handleExplore = () => {
-    navigate("/reservation");
+    navigate("/reservation"); // بدّلها /offers إذا تحب
   };
 
   const handleLogoutClick = () => {
@@ -21,6 +21,54 @@ export default function HomePage({ userName, isLoggedIn, onLogout }) {
   // navigate to city hotels page
   const goToCityHotels = (citySlug) => {
     navigate(`/hotels/${citySlug}`);
+  };
+
+  // ⭐ Avis sur le site Travana (section homepage)
+  const [siteReviews, setSiteReviews] = useState([
+    {
+      id: 1,
+      name: "Nadine",
+      rating: 5.0,
+      text:
+        "Réservation rapide et simple, j'ai trouvé mon hôtel à Hammamet en quelques minutes seulement.",
+    },
+    {
+      id: 2,
+      name: "Sarra",
+      rating: 4.8,
+      text:
+        "Interface claire, beaucoup de choix d'hôtels et des prix très intéressants pour Sousse et Tunis.",
+    },
+    {
+      id: 3,
+      name: "Yassine",
+      rating: 4.6,
+      text:
+        "Service client réactif, j'ai pu modifier ma réservation sans complication. Je recommande Travana.",
+    },
+  ]);
+
+  const [showSiteForm, setShowSiteForm] = useState(false);
+  const [siteAuthor, setSiteAuthor] = useState("");
+  const [siteRating, setSiteRating] = useState("5");
+  const [siteComment, setSiteComment] = useState("");
+
+  const handleSubmitSiteReview = (e) => {
+    e.preventDefault();
+    if (!siteAuthor.trim() || !siteComment.trim()) return;
+
+    const newReview = {
+      id: Date.now(),
+      name: siteAuthor.trim(),
+      rating: parseFloat(siteRating),
+      text: siteComment.trim(),
+    };
+
+    setSiteReviews((prev) => [newReview, ...prev]);
+    setSiteAuthor("");
+    setSiteRating("5");
+    setSiteComment("");
+    setShowSiteForm(false);
   };
 
   return (
@@ -199,8 +247,6 @@ export default function HomePage({ userName, isLoggedIn, onLogout }) {
             </div>
           </div>
 
-        
-
           <button
             className="btn btn-lg text-white mt-3"
             style={{
@@ -307,6 +353,103 @@ export default function HomePage({ userName, isLoggedIn, onLogout }) {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* 💬 SITE REVIEWS SECTION */}
+      <div className="container my-5">
+        <div className="d-flex justify-content-between align-items-center mb-2">
+          <div>
+            <h2 className="fw-bold mb-1">What travelers say about Travana</h2>
+            <p className="text-muted mb-0">
+              Real feedback from people who used Travana to book their stays.
+            </p>
+          </div>
+
+          <button
+            className="btn btn-outline-dark btn-sm rounded-pill"
+            onClick={() => setShowSiteForm((v) => !v)}
+          >
+            ✏️ Leave a review
+          </button>
+        </div>
+
+        <div className="row g-4 mt-3">
+          {siteReviews.map((rev) => (
+            <div className="col-md-4" key={rev.id}>
+              <div className="h-100 p-3 shadow rounded bg-white text-start">
+                <div className="d-flex justify-content-between align-items-center mb-2">
+                  <h6 className="fw-bold mb-0">{rev.name}</h6>
+                  <span className="text-warning fw-semibold">
+                    ★ {rev.rating.toFixed(1)} / 5
+                  </span>
+                </div>
+                <p className="text-muted mb-0">{rev.text}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {showSiteForm && (
+          <div className="row g-4 mt-4">
+            <div className="col-md-6">
+              <div className="p-3 shadow rounded bg-white text-start">
+                <h5 className="fw-bold mb-3">Write a review about Travana</h5>
+                <form onSubmit={handleSubmitSiteReview}>
+                  <div className="mb-3">
+                    <label className="form-label">Your name</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={siteAuthor}
+                      onChange={(e) => setSiteAuthor(e.target.value)}
+                      placeholder="Your name"
+                      required
+                    />
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="form-label">Rating</label>
+                    <select
+                      className="form-select"
+                      value={siteRating}
+                      onChange={(e) => setSiteRating(e.target.value)}
+                    >
+                      <option value="5">5 - Excellent</option>
+                      <option value="4.5">4.5 - Very good</option>
+                      <option value="4">4 - Good</option>
+                      <option value="3.5">3.5 - Average</option>
+                      <option value="3">3 - Poor</option>
+                    </select>
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="form-label">Comment</label>
+                    <textarea
+                      className="form-control"
+                      rows="3"
+                      value={siteComment}
+                      onChange={(e) => setSiteComment(e.target.value)}
+                      placeholder="Share your experience with Travana..."
+                      required
+                    ></textarea>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="btn w-100 text-white fw-semibold"
+                    style={{
+                      background:
+                        "linear-gradient(to right, #ff9f40, #8a4fff)",
+                      borderRadius: "999px",
+                    }}
+                  >
+                    Submit review
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* WHY CHOOSE US */}

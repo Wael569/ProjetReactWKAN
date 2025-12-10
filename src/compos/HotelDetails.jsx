@@ -264,7 +264,7 @@ export default function HotelDetails() {
                       onChange={(e) => setReviewComment(e.target.value)}
                       placeholder="Partagez votre expérience..."
                       required
-                    ></textarea>
+                    ></textarea> 
                   </div>
 
                   <button
