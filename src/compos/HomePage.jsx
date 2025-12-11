@@ -7,8 +7,47 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 export default function HomePage({ userName, isLoggedIn, onLogout }) {
   const navigate = useNavigate();
 
+  const displayName = userName || "";
+
+  // 🔹 state mta3 formulaire de recherche
+  const [destination, setDestination] = useState("");
+  const [checkIn, setCheckIn] = useState("");
+  const [checkOut, setCheckOut] = useState("");
+  const [adults, setAdults] = useState(1);
+  const [children, setChildren] = useState(0);
+
+  // mapping ben destination text w citySlug
+  const mapDestinationToSlug = (dest) => {
+    const d = dest.trim().toLowerCase();
+    const map = {
+      tunis: "tunis",
+      sousse: "sousse",
+      hammamet: "hammamet",
+      "la marsa": "la-marsa",
+      "la-marsa": "la-marsa",
+    };
+    return map[d] || null;
+  };
+
   const handleExplore = () => {
-    navigate("/reservation"); // بدّلها /offers إذا تحب
+    const citySlug = mapDestinationToSlug(destination);
+    if (!citySlug) {
+      alert("Please enter a valid destination: Tunis, Sousse, Hammamet or La Marsa.");
+      return;
+    }
+    if (!checkIn || !checkOut) {
+      alert("Please select both check-in and check-out dates.");
+      return;
+    }
+
+    navigate(`/hotels/${citySlug}`, {
+      state: {
+        checkIn,
+        checkOut,
+        adults: Number(adults),
+        children: Number(children),
+      },
+    });
   };
 
   const handleLogoutClick = () => {
@@ -16,9 +55,7 @@ export default function HomePage({ userName, isLoggedIn, onLogout }) {
     navigate("/");
   };
 
-  const displayName = userName || "";
-
-  // navigate to city hotels page
+  // click from cards ↓
   const goToCityHotels = (citySlug) => {
     navigate(`/hotels/${citySlug}`);
   };
@@ -216,15 +253,30 @@ export default function HomePage({ userName, isLoggedIn, onLogout }) {
             <div className="row g-3">
               <div className="col-md">
                 <label className="form-label">Destination</label>
-                <input className="form-control" placeholder="Where to?" />
+                <input
+                  className="form-control"
+                  placeholder="Tunis, Sousse, Hammamet, La Marsa..."
+                  value={destination}
+                  onChange={(e) => setDestination(e.target.value)}
+                />
               </div>
               <div className="col-md">
                 <label className="form-label">Check In</label>
-                <input type="date" className="form-control" />
+                <input
+                  type="date"
+                  className="form-control"
+                  value={checkIn}
+                  onChange={(e) => setCheckIn(e.target.value)}
+                />
               </div>
               <div className="col-md">
                 <label className="form-label">Check Out</label>
-                <input type="date" className="form-control" />
+                <input
+                  type="date"
+                  className="form-control"
+                  value={checkOut}
+                  onChange={(e) => setCheckOut(e.target.value)}
+                />
               </div>
               <div className="col-md">
                 <label className="form-label">Adults</label>
@@ -232,7 +284,8 @@ export default function HomePage({ userName, isLoggedIn, onLogout }) {
                   type="number"
                   className="form-control"
                   min="1"
-                  defaultValue="1"
+                  value={adults}
+                  onChange={(e) => setAdults(e.target.value)}
                 />
               </div>
               <div className="col-md">
@@ -241,7 +294,8 @@ export default function HomePage({ userName, isLoggedIn, onLogout }) {
                   type="number"
                   className="form-control"
                   min="0"
-                  defaultValue="0"
+                  value={children}
+                  onChange={(e) => setChildren(e.target.value)}
                 />
               </div>
             </div>

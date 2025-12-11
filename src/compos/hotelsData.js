@@ -155,6 +155,13 @@ export const HOTELS_BY_CITY = {
   ],
 };
 
+
+export function getHotelsByCity(citySlug) {
+  const cityKey = citySlug?.toLowerCase();
+  return HOTELS_BY_CITY[cityKey] || [];
+}
+
+
 export function getHotelByCityAndId(citySlug, hotelId) {
   const cityKey = citySlug?.toLowerCase();
   const list = HOTELS_BY_CITY[cityKey] || [];

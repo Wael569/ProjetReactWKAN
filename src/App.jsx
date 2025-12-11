@@ -13,8 +13,10 @@ import UserSignup from "./ComponentsLogin/UserSignup.jsx";
 import ForgotPassword from "./ComponentsLogin/ForgotPassword.jsx";
 
 import Reservation from "./compos/Reservation.jsx";
-import HotelsByCity from "./compos/HotelsByCity.jsx";
 import HotelDetails from "./compos/HotelDetails.jsx";
+import CityHotels from "./pages/CityHotels.jsx";
+import Confirmation from "./compos/Confirmation.jsx";
+
 
 import "./App.css";
 
@@ -47,15 +49,14 @@ export default function App() {
           }
         />
 
-        {/* OFFERS + DETAILS */}
+       
         <Route path="/offers" element={<OffersPage />} />
         <Route path="/offers/:offerSlug" element={<OfferDetails />} />
 
-        {/* NEWS & CONTACT */}
+ 
         <Route path="/news" element={<NewsPage />} />
         <Route path="/contact" element={<ContactPage />} />
 
-        {/* AUTH */}
         <Route
           path="/login"
           element={<UserLogin onLogin={handleLoginSuccess} />}
@@ -63,13 +64,18 @@ export default function App() {
         <Route path="/signup" element={<UserSignup />} />
         <Route path="/forgot" element={<ForgotPassword />} />
 
-        {/* BOOKING */}
-        <Route path="/reservation" element={<Reservation />} />
-        <Route path="/hotels/:citySlug" element={<HotelsByCity />} />
+       
+        <Route path="/hotels/:citySlug" element={<CityHotels />} />
+
+     
         <Route path="/hotels/:citySlug/:hotelId" element={<HotelDetails />} />
 
-        {/* fallback */}
+        <Route path="/reservation" element={<Reservation />} />
+
+     
         <Route path="*" element={<Navigate to="/" replace />} />
+
+        <Route path="/confirmation" element={<Confirmation />} />
       </Routes>
     </div>
   );

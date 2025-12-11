@@ -1,11 +1,16 @@
 // src/compos/HotelDetails.jsx
 import React, { useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
 import { getHotelByCityAndId } from "./hotelsData";
 
 export default function HotelDetails() {
   const { citySlug, hotelId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // 🔹 data jeya men CityHotels (checkIn, checkOut, adults, children)
+  const search = location.state || {};
+  const { checkIn, checkOut, adults = 1, children = 0 } = search;
 
   const hotel = getHotelByCityAndId(citySlug, hotelId);
 
@@ -15,6 +20,85 @@ export default function HotelDetails() {
         .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
         .join(" ")
     : "";
+
+  // 🧮 nombre de nuits
+  let nights = null;
+  if (checkIn && checkOut) {
+    const d1 = new Date(checkIn);
+    const d2 = new Date(checkOut);
+    const diffMs = d2 - d1;
+    if (!isNaN(diffMs) && diffMs > 0) {
+      nights = diffMs / (1000 * 60 * 60 * 24);
+    }
+  }
+
+  const nbAdults = Number(adults) || 0;
+  const nbChildren = Number(children) || 0;
+  const peopleFactor = nbAdults + nbChildren * 0.5;
+
+  // 🧮 total price
+  let totalPrice = null;
+  if (hotel && nights && peopleFactor > 0) {
+    totalPrice = hotel.priceValue * nights * peopleFactor;
+  }
+
+  // ---------- AVIS CLIENTS (comme avant) ----------
+  const [reviews, setReviews] = useState([
+    { id: 1, name: "nadine", rating: 5.0, text: "tresssssss bienn" },
+    {
+      id: 2,
+      name: "Sarra",
+      rating: 4.5,
+      text: "Très bel hôtel, chambre propre et personnel très sympa.",
+    },
+    {
+      id: 3,
+      name: "Yassine",
+      rating: 4.0,
+      text: "Bon rapport qualité-prix, petit déjeuner pourrait être amélioré.",
+    },
+  ]);
+
+  const [newName, setNewName] = useState("");
+  const [newRating, setNewRating] = useState("5");
+  const [newText, setNewText] = useState("");
+
+  const handleAddReview = (e) => {
+    e.preventDefault();
+    if (!newName.trim() || !newText.trim()) return;
+
+    const r = {
+      id: Date.now(),
+      name: newName.trim(),
+      rating: parseFloat(newRating),
+      text: newText.trim(),
+    };
+    setReviews((prev) => [r, ...prev]);
+    setNewName("");
+    setNewRating("5");
+    setNewText("");
+  };
+
+  // ---------- BOOK THIS HOTEL ----------
+  const handleBook = () => {
+    if (!hotel) return;
+    navigate("/reservation", {
+      state: {
+        citySlug,
+        cityName,
+        hotelId: hotel.id,
+        hotelName: hotel.name,
+        pricePerNight: hotel.priceValue,
+        currency: hotel.currency,
+        checkIn,
+        checkOut,
+        adults: nbAdults,
+        children: nbChildren,
+        nights,
+        totalPrice,
+      },
+    });
+  };
 
   if (!hotel) {
     return (
@@ -34,66 +118,10 @@ export default function HotelDetails() {
     );
   }
 
-  // 🟡 Avis initiaux (min hotel.reviews wila fausses données)
-  const initialReviews =
-    hotel.reviews && Array.isArray(hotel.reviews)
-      ? hotel.reviews
-      : [
-          {
-            id: 1,
-            author: "Sarra",
-            rating: 4.5,
-            comment: "Très bel hôtel, chambre propre et personnel très sympa.",
-          },
-          {
-            id: 2,
-            author: "Yassine",
-            rating: 4.0,
-            comment:
-              "Bon rapport qualité-prix, petit déjeuner pourrait être amélioré.",
-          },
-        ];
-
-  const [reviews, setReviews] = useState(initialReviews);
-  const [reviewAuthor, setReviewAuthor] = useState("");
-  const [reviewRating, setReviewRating] = useState("5");
-  const [reviewComment, setReviewComment] = useState("");
-
-  const handleBook = () => {
-    // path /offers kif ma fi App.jsx
-    navigate("/offers", {
-      state: {
-        citySlug,
-        cityName,
-        hotelId: hotel.id,
-        hotelName: hotel.name,
-        pricePerNight: hotel.priceValue,
-        currency: hotel.currency,
-      },
-    });
-  };
-
-  const handleSubmitReview = (e) => {
-    e.preventDefault();
-    if (!reviewAuthor.trim() || !reviewComment.trim()) return;
-
-    const newReview = {
-      id: Date.now(),
-      author: reviewAuthor.trim(),
-      rating: parseFloat(reviewRating),
-      comment: reviewComment.trim(),
-    };
-
-    setReviews((prev) => [newReview, ...prev]);
-    setReviewAuthor("");
-    setReviewRating("5");
-    setReviewComment("");
-  };
-
   return (
     <div className="bg-light min-vh-100 py-4">
       <div className="container">
-        {/* Breadcrumb + back */}
+        {/* BREADCRUMB + TITLE */}
         <div className="d-flex justify-content-between align-items-center mb-4">
           <div>
             <small className="text-muted">
@@ -113,16 +141,32 @@ export default function HotelDetails() {
             <p className="text-muted mb-0">
               {hotel.location} · ⭐ {hotel.rating} / 5 · {hotel.price}
             </p>
+
+            {/* 🔥 هنا نظهر التوتال متاع الستاي */}
+            {totalPrice !== null && (
+              <p className="text-success fw-semibold mb-0">
+                Total for your stay ({nights} night(s), {nbAdults} adult(s),{" "}
+                {nbChildren} child(ren)): {totalPrice.toFixed(2)}{" "}
+                {hotel.currency}
+              </p>
+            )}
           </div>
+
           <button
-            className="btn btn-outline-secondary"
+            className="btn fw-semibold"
+            style={{
+              background: "rgba(155, 107, 255, 0.95)",
+              color: "white",
+              borderRadius: "999px",
+              padding: "0.4rem 1.4rem",
+            }}
             onClick={() => navigate(-1)}
           >
             ← Back
           </button>
         </div>
 
-        {/* Content principal */}
+        {/* MAIN CONTENT */}
         <div className="row g-4">
           <div className="col-md-7">
             <img
@@ -144,8 +188,12 @@ export default function HotelDetails() {
                   <li>Location: {hotel.location}</li>
                   <li>Rating: ⭐ {hotel.rating} / 5</li>
                   <li>Price: {hotel.price}</li>
-                  <li>Free Wi-Fi and 24/7 front desk</li>
-                  <li>Popular choice for couples and families</li>
+                  {nights && (
+                    <li>
+                      Stay length: {nights} night(s) · {nbAdults} adult(s) ·{" "}
+                      {nbChildren} child(ren)
+                    </li>
+                  )}
                 </ul>
 
                 <button
@@ -174,67 +222,40 @@ export default function HotelDetails() {
           </div>
         </div>
 
-        {/* ⭐ AVIS DES CLIENTS + FORMULAIRE */}
-        <div className="row mt-5 g-4 align-items-start">
-          {/* LISTE DES AVIS */}
-          <div className="col-md-7">
-            <div className="card border-0 shadow-sm rounded-4 h-100">
-              <div className="card-body">
-                <h4 className="fw-bold mb-3">Avis des clients</h4>
-
-                {reviews.length === 0 ? (
-                  <p className="text-muted mb-0">
-                    Pas encore d&apos;avis. Soyez le premier à laisser un avis !
-                  </p>
-                ) : (
-                  <ul className="list-group list-group-flush">
-                    {reviews.map((rev) => (
-                      <li
-                        key={rev.id}
-                        className="list-group-item border-0 px-0 py-3"
-                      >
-                        <div className="d-flex justify-content-between align-items-start">
-                          <div>
-                            <div className="fw-semibold text-capitalize">
-                              {rev.author}
-                            </div>
-                            <p className="mb-0 text-muted small mt-1">
-                              {rev.comment}
-                            </p>
-                          </div>
-
-                          <div className="ms-3 d-flex align-items-center text-warning fw-semibold small">
-                            <span
-                              className="me-1"
-                              style={{ fontSize: "1.1rem" }}
-                            >
-                              ★
-                            </span>
-                            {rev.rating.toFixed(1)} / 5
-                          </div>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
+        {/* AVIS CLIENTS + FORM */}
+        <div className="row g-4 mt-5">
+          <div className="col-md-6">
+            <h4 className="fw-bold mb-3">Avis des clients</h4>
+            <div className="list-group">
+              {reviews.map((r) => (
+                <div
+                  key={r.id}
+                  className="list-group-item border-0 mb-2 shadow-sm rounded"
+                >
+                  <div className="d-flex justify-content-between align-items-center">
+                    <strong>{r.name}</strong>
+                    <span className="text-warning small">
+                      ★ {r.rating.toFixed(1)} / 5
+                    </span>
+                  </div>
+                  <p className="mb-0 text-muted small mt-1">{r.text}</p>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* FORMULAIRE AJOUT AVIS */}
-          <div className="col-md-5">
-            <div className="card border-0 shadow-sm rounded-4">
+          <div className="col-md-6">
+            <h4 className="fw-bold mb-3">Ajouter votre avis</h4>
+            <div className="card border-0 shadow-sm">
               <div className="card-body">
-                <h5 className="fw-semibold mb-3">Ajouter votre avis</h5>
-
-                <form onSubmit={handleSubmitReview}>
+                <form onSubmit={handleAddReview}>
                   <div className="mb-3">
                     <label className="form-label">Votre nom</label>
                     <input
                       type="text"
                       className="form-control"
-                      value={reviewAuthor}
-                      onChange={(e) => setReviewAuthor(e.target.value)}
+                      value={newName}
+                      onChange={(e) => setNewName(e.target.value)}
                       placeholder="Votre nom"
                       required
                     />
@@ -244,14 +265,14 @@ export default function HotelDetails() {
                     <label className="form-label">Note</label>
                     <select
                       className="form-select"
-                      value={reviewRating}
-                      onChange={(e) => setReviewRating(e.target.value)}
+                      value={newRating}
+                      onChange={(e) => setNewRating(e.target.value)}
                     >
                       <option value="5">5 - Excellent</option>
                       <option value="4.5">4.5 - Très bien</option>
                       <option value="4">4 - Bien</option>
                       <option value="3.5">3.5 - Moyen</option>
-                      <option value="3">3 - Peut mieux faire</option>
+                      <option value="3">3 - Mauvais</option>
                     </select>
                   </div>
 
@@ -260,11 +281,11 @@ export default function HotelDetails() {
                     <textarea
                       className="form-control"
                       rows="3"
-                      value={reviewComment}
-                      onChange={(e) => setReviewComment(e.target.value)}
+                      value={newText}
+                      onChange={(e) => setNewText(e.target.value)}
                       placeholder="Partagez votre expérience..."
                       required
-                    ></textarea> 
+                    ></textarea>
                   </div>
 
                   <button
@@ -273,17 +294,15 @@ export default function HotelDetails() {
                     style={{
                       background:
                         "linear-gradient(to right, #ff9f40, #8a4fff)",
-                      borderRadius: "999px",
                     }}
                   >
-                    Envoyer l&apos;avis
+                    Envoyer l'avis
                   </button>
                 </form>
               </div>
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );
