@@ -16,6 +16,15 @@ export default function HomePage({ userName, isLoggedIn, onLogout }) {
   const [adults, setAdults] = useState(1);
   const [children, setChildren] = useState(0);
 
+  // helper: kol action 9bal ma yetsar, ntcheckiw login
+  const requireLogin = () => {
+    if (!isLoggedIn) {
+      navigate("/login");
+      return false;
+    }
+    return true;
+  };
+
   // mapping ben destination text w citySlug
   const mapDestinationToSlug = (dest) => {
     const d = dest.trim().toLowerCase();
@@ -30,9 +39,14 @@ export default function HomePage({ userName, isLoggedIn, onLogout }) {
   };
 
   const handleExplore = () => {
+    // lezem login louwel
+    if (!requireLogin()) return;
+
     const citySlug = mapDestinationToSlug(destination);
     if (!citySlug) {
-      alert("Please enter a valid destination: Tunis, Sousse, Hammamet or La Marsa.");
+      alert(
+        "Please enter a valid destination: Tunis, Sousse, Hammamet or La Marsa."
+      );
       return;
     }
     if (!checkIn || !checkOut) {
@@ -52,11 +66,12 @@ export default function HomePage({ userName, isLoggedIn, onLogout }) {
 
   const handleLogoutClick = () => {
     if (onLogout) onLogout();
-    navigate("/");
+    navigate("/login");
   };
 
   // click from cards ↓
   const goToCityHotels = (citySlug) => {
+    if (!requireLogin()) return;
     navigate(`/hotels/${citySlug}`);
   };
 
@@ -108,6 +123,22 @@ export default function HomePage({ userName, isLoggedIn, onLogout }) {
     setShowSiteForm(false);
   };
 
+  // click 3ala "Leave a review"
+  const handleLeaveReviewClick = () => {
+    if (!requireLogin()) return;
+    setShowSiteForm((v) => !v);
+  };
+
+  // handler lel navbar links (Offers / News / Contact)
+  const handleProtectedNavClick = (e, path) => {
+    if (!requireLogin()) {
+      e.preventDefault();
+      return;
+    }
+    navigate(path);
+    e.preventDefault(); // 5atir ista3melna navigate bel hand
+  };
+
   return (
     <div className="bg-white text-dark">
       {/* HERO SECTION */}
@@ -155,24 +186,30 @@ export default function HomePage({ userName, isLoggedIn, onLogout }) {
               >
                 Home
               </Link>
-              <Link
-                to="/offers"
+
+              <a
+                href="/offers"
                 className="fw-semibold fs-5 text-white text-decoration-none"
+                onClick={(e) => handleProtectedNavClick(e, "/offers")}
               >
                 Offers
-              </Link>
-              <Link
-                to="/news"
+              </a>
+
+              <a
+                href="/news"
                 className="fw-semibold fs-5 text-white text-decoration-none"
+                onClick={(e) => handleProtectedNavClick(e, "/news")}
               >
                 News
-              </Link>
-              <Link
-                to="/contact"
+              </a>
+
+              <a
+                href="/contact"
                 className="fw-semibold fs-5 text-white text-decoration-none"
+                onClick={(e) => handleProtectedNavClick(e, "/contact")}
               >
                 Contact
-              </Link>
+              </a>
             </nav>
 
             {isLoggedIn ? (
@@ -421,7 +458,7 @@ export default function HomePage({ userName, isLoggedIn, onLogout }) {
 
           <button
             className="btn btn-outline-dark btn-sm rounded-pill"
-            onClick={() => setShowSiteForm((v) => !v)}
+            onClick={handleLeaveReviewClick}
           >
             ✏️ Leave a review
           </button>
